@@ -17,17 +17,11 @@ public:
   using Point = pcl::PointXYZI;
   using Cloud = pcl::PointCloud<pcl::PointXYZI>;
 
-  void Track(const Cloud::Ptr &centroids_in);
+  void Track(const Cloud::Ptr &centroids_in, const Cloud::Ptr &cloud_in);
 
 private:
-  bool first_run{false};
-  Cloud::Ptr centroids_old;
-
   ros::NodeHandle &nh_;
-
-  ros::Publisher pub_markers_arrows;
-
-  std::vector<Cloud::Ptr> arrow_sets;
+  ros::Publisher pub_cloud_search_;
 };
 
 

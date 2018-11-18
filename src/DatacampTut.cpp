@@ -45,7 +45,7 @@ DatacampTut::CallbackLaser(const sensor_msgs::PointCloud2ConstPtr &msg_cloud) {
 
 
   // Downsample it
-  Cloud::Ptr cloud_ds = PclStuff::Downsample(cloud_in, 0.1f);
+  Cloud::Ptr cloud_ds = PclStuff::Downsample(cloud_roi, 0.1f);
   RosRelated::PublishCloud(cloud_ds, pub_cloud_downsampled_);
 
   // Remove ground from the downsampled point cloud
@@ -62,7 +62,7 @@ DatacampTut::CallbackLaser(const sensor_msgs::PointCloud2ConstPtr &msg_cloud) {
   std::tie(cloud_cluster, centroids,
            vec_lengths_x, vec_lengths_y, vec_lengths_z) =
     PclStuff::MiniClusterer(cloud_ds, 0.8, 3, 8000,
-                            1, 1, 1.5,
+                            1.2, 1.2, 2,
                             0.01, 0.01, 0.01);
 
   RosRelated::PublishCloud(cloud_cluster, pub_clusters_);
@@ -72,5 +72,5 @@ DatacampTut::CallbackLaser(const sensor_msgs::PointCloud2ConstPtr &msg_cloud) {
                                vec_lengths_x, vec_lengths_y, vec_lengths_z,
                                pub_markers_);
 
-  tracker_->Track(centroids);
+  tracker_->Track(centroids, cloud_ds);
 }

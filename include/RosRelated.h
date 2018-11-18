@@ -29,8 +29,7 @@ public:
     int id);
 
   static visualization_msgs::MarkerArray
-  ArrowSetToMarkerArray(std::vector<pcl::PointCloud<pcl::PointXYZ>> arrow_set,
-                        int marker_id);
+  ArrowSetToMarkerArray(std::vector<Cloud::Ptr> arrow_sets, int marker_id);
 
 };
 

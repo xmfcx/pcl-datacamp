@@ -78,19 +78,18 @@ RosRelated::points_to_arrow(geometry_msgs::Point p1,
 }
 
 visualization_msgs::MarkerArray RosRelated::ArrowSetToMarkerArray(
-  std::vector<pcl::PointCloud<pcl::PointXYZ>> arrow_set, int marker_id) {
-
+  std::vector<Cloud::Ptr> arrow_sets, int marker_id) {
   visualization_msgs::MarkerArray markerArray = visualization_msgs::MarkerArray();
-  for (unsigned long j = 0; j < arrow_set.size(); j++) {
-    for (unsigned long i = 1; i < arrow_set[j].size(); i++) {
+  for (auto &arrow_set : arrow_sets) {
+    for (unsigned long i = 1; i < arrow_set->points.size(); i++) {
       geometry_msgs::Point point1;
-      point1.x = arrow_set[j][i - 1].x;
-      point1.y = arrow_set[j][i - 1].y;
-      point1.z = arrow_set[j][i - 1].z;
+      point1.x = arrow_set->points[i - 1].x;
+      point1.y = arrow_set->points[i - 1].y;
+      point1.z = arrow_set->points[i - 1].z;
       geometry_msgs::Point point2;
-      point2.x = arrow_set[j][i].x;
-      point2.y = arrow_set[j][i].y;
-      point2.z = arrow_set[j][i].z;
+      point2.x = arrow_set->points[i].x;
+      point2.y = arrow_set->points[i].y;
+      point2.z = arrow_set->points[i].z;
       auto marker = points_to_arrow(point1, point2, marker_id);
       marker_id++;
       markerArray.markers.push_back(marker);
