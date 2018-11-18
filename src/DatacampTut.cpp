@@ -3,24 +3,26 @@
 DatacampTut::DatacampTut(ros::NodeHandle &nh) : nh_(nh) {
   // Publishers
   //// Point Clouds
-  pub_cloud_raw_ = nh.advertise<sensor_msgs::PointCloud2>
+  pub_cloud_raw_ = nh_.advertise<sensor_msgs::PointCloud2>
     ("/cloud_raw", 1);
-  pub_cloud_downsampled_ = nh.advertise<sensor_msgs::PointCloud2>
+  pub_cloud_downsampled_ = nh_.advertise<sensor_msgs::PointCloud2>
     ("/cloud_downsampled", 1);
-  pub_cloud_groundless_ = nh.advertise<sensor_msgs::PointCloud2>
+  pub_cloud_groundless_ = nh_.advertise<sensor_msgs::PointCloud2>
     ("/cloud_groundless", 1);
-  pub_clusters_ = nh.advertise<sensor_msgs::PointCloud2>
+  pub_clusters_ = nh_.advertise<sensor_msgs::PointCloud2>
     ("/cloud_clusters", 1);
-  pub_cluster_centroids_ = nh.advertise<sensor_msgs::PointCloud2>
+  pub_cluster_centroids_ = nh_.advertise<sensor_msgs::PointCloud2>
     ("/cloud_cluster_centroids", 1);
 
   //// Markers
-  pub_markers_ = nh.advertise<visualization_msgs::MarkerArray>
+  pub_markers_ = nh_.advertise<visualization_msgs::MarkerArray>
     ("/markers_detections", 1);
 
   // Subscribers
-  sub_velodyne_points_ = nh.subscribe("/velodyne_points", 1,
-                                     &DatacampTut::CallbackLaser, this);
+  sub_velodyne_points_ = nh_.subscribe("/velodyne_points", 1,
+                                       &DatacampTut::CallbackLaser, this);
+
+  tracker_ = std::make_shared<Tracker>(nh_);
 }
 
 void
@@ -57,4 +59,6 @@ DatacampTut::CallbackLaser(const sensor_msgs::PointCloud2ConstPtr &msg_cloud) {
   RosRelated::PublishCylinders(centroids,
                                vec_lengths_x, vec_lengths_y, vec_lengths_z,
                                pub_markers_);
+
+  tracker_->Track(centroids);
 }

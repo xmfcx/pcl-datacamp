@@ -50,6 +50,54 @@ void RosRelated::PublishCylinders(const Cloud::Ptr &centroids,
   publisher.publish(marker_array);
 }
 
+visualization_msgs::Marker
+RosRelated::points_to_arrow(geometry_msgs::Point p1,
+                            geometry_msgs::Point p2,
+                            int id) {
+  visualization_msgs::Marker marker = visualization_msgs::Marker();
+  marker.header.frame_id = "velodyne";
+  marker.header.stamp = ros::Time::now();
+  marker.ns = "markeros" + std::to_string(id);
+  marker.id = id;
+  marker.type = visualization_msgs::Marker::ARROW;
+  marker.action = visualization_msgs::Marker::ADD;
+
+  marker.scale.x = 0.2;
+  marker.scale.y = 0.5;
+  marker.scale.z = 0.5;
+
+  marker.color.a = 1.0;
+
+  marker.color.r = 0.0f;
+  marker.color.g = 1.0f;
+  marker.color.b = 1.0f;
+
+  marker.points.push_back(p1);
+  marker.points.push_back(p2);
+  return marker;
+}
+
+visualization_msgs::MarkerArray RosRelated::ArrowSetToMarkerArray(
+  std::vector<pcl::PointCloud<pcl::PointXYZ>> arrow_set, int marker_id) {
+
+  visualization_msgs::MarkerArray markerArray = visualization_msgs::MarkerArray();
+  for (unsigned long j = 0; j < arrow_set.size(); j++) {
+    for (unsigned long i = 1; i < arrow_set[j].size(); i++) {
+      geometry_msgs::Point point1;
+      point1.x = arrow_set[j][i - 1].x;
+      point1.y = arrow_set[j][i - 1].y;
+      point1.z = arrow_set[j][i - 1].z;
+      geometry_msgs::Point point2;
+      point2.x = arrow_set[j][i].x;
+      point2.y = arrow_set[j][i].y;
+      point2.z = arrow_set[j][i].z;
+      auto marker = points_to_arrow(point1, point2, marker_id);
+      marker_id++;
+      markerArray.markers.push_back(marker);
+    }
+  }
+  return markerArray;
+}
 
 void RosRelated::PublishCloud(const Cloud::ConstPtr &cloud_in,
                               const ros::Publisher &publisher) {

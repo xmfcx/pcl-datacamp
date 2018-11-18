@@ -6,6 +6,7 @@
 #include <pcl/point_types.h>
 #include "PclStuff.h"
 #include "RosRelated.h"
+#include "Tracker.h"
 
 class DatacampTut {
 public:
@@ -24,6 +25,8 @@ private:
   ros::Publisher pub_markers_;
 
   ros::NodeHandle& nh_;
+
+  Tracker::Ptr tracker_;
 
   void CallbackLaser(const sensor_msgs::PointCloud2ConstPtr &msg_cloud);
 };

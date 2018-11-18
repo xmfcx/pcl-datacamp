@@ -21,6 +21,17 @@ public:
 
   static void PublishCloud(const Cloud::ConstPtr &cloud_in,
                            const ros::Publisher &publisher);
+
+
+  static visualization_msgs::Marker points_to_arrow(
+    geometry_msgs::Point p1,
+    geometry_msgs::Point p2,
+    int id);
+
+  static visualization_msgs::MarkerArray
+  ArrowSetToMarkerArray(std::vector<pcl::PointCloud<pcl::PointXYZ>> arrow_set,
+                        int marker_id);
+
 };
 
 
