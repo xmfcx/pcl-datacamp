@@ -5,6 +5,8 @@ DatacampTut::DatacampTut(ros::NodeHandle &nh) : nh_(nh) {
   //// Point Clouds
   pub_cloud_raw_ = nh.advertise<sensor_msgs::PointCloud2>
     ("/cloud_raw", 1);
+  pub_cloud_roi_ = nh.advertise<sensor_msgs::PointCloud2>
+    ("/cloud_roi", 1);
   pub_cloud_downsampled_ = nh.advertise<sensor_msgs::PointCloud2>
     ("/cloud_downsampled", 1);
   pub_cloud_groundless_ = nh.advertise<sensor_msgs::PointCloud2>
@@ -20,7 +22,7 @@ DatacampTut::DatacampTut(ros::NodeHandle &nh) : nh_(nh) {
 
   // Subscribers
   sub_velodyne_points_ = nh.subscribe("/velodyne_points", 1,
-                                     &DatacampTut::CallbackLaser, this);
+                                      &DatacampTut::CallbackLaser, this);
 }
 
 void
@@ -30,12 +32,22 @@ DatacampTut::CallbackLaser(const sensor_msgs::PointCloud2ConstPtr &msg_cloud) {
   pcl::fromROSMsg(*msg_cloud, *cloud_in);
   RosRelated::PublishCloud(cloud_in, pub_cloud_raw_);
 
+  // Keep Region of Interest
+  Cloud::Ptr cloud_roi(new Cloud);
+  for (const auto &point:cloud_in->points) {
+    if (point.x > 10 || point.y < -10 || point.z < -0.6)
+      continue;
+    cloud_roi->points.push_back(point);
+  }
+  RosRelated::PublishCloud(cloud_roi, pub_cloud_roi_);
+
+
   // Downsample it
   Cloud::Ptr cloud_ds = PclStuff::Downsample(cloud_in, 0.1f);
   RosRelated::PublishCloud(cloud_ds, pub_cloud_downsampled_);
 
   // Remove ground from the downsampled point cloud
-  Cloud::Ptr cloud_groundless = PclStuff::GroundRemover(cloud_ds, 0.2f);
+  Cloud::Ptr cloud_groundless = PclStuff::GroundRemover(cloud_ds, 0.5f);
   RosRelated::PublishCloud(cloud_groundless, pub_cloud_groundless_);
 
   // Apply euclidian clustering to the groundless cloud
@@ -47,8 +59,8 @@ DatacampTut::CallbackLaser(const sensor_msgs::PointCloud2ConstPtr &msg_cloud) {
   std::vector<float> vec_lengths_z;
   std::tie(cloud_cluster, centroids,
            vec_lengths_x, vec_lengths_y, vec_lengths_z) =
-    PclStuff::MiniClusterer(cloud_groundless, 0.8, 3, 8000,
-                            0.8, 0.8, 1.2,
+    PclStuff::MiniClusterer(cloud_ds, 0.8, 3, 8000,
+                            1, 1, 1.5,
                             0.01, 0.01, 0.01);
 
   RosRelated::PublishCloud(cloud_cluster, pub_clusters_);

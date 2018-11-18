@@ -17,6 +17,7 @@ private:
   ros::Subscriber sub_velodyne_points_;
 
   ros::Publisher pub_cloud_raw_;
+  ros::Publisher pub_cloud_roi_;
   ros::Publisher pub_cloud_downsampled_;
   ros::Publisher pub_cloud_groundless_;
   ros::Publisher pub_clusters_;
