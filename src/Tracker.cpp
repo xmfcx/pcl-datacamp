@@ -11,7 +11,7 @@ Tracker::Tracker(ros::NodeHandle &nh) : nh_(nh) {
 
 }
 
-void Tracker::Track(const Cloud::ConstPtr &centroids_in) {
+void Tracker::Track(const Cloud::Ptr &centroids_in) {
   if (first_run) {
     centroids_old = centroids_in;
     for (const auto &point : centroids_in->points) {

@@ -17,7 +17,7 @@ public:
   using Point = pcl::PointXYZI;
   using Cloud = pcl::PointCloud<pcl::PointXYZI>;
 
-  void Track(const Cloud::ConstPtr &centroids_in);
+  void Track(const Cloud::Ptr &centroids_in);
 
 private:
   bool first_run{false};
